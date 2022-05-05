@@ -1,4 +1,2 @@
-The Survival Guide Collection
+The Digital Survival Guide Collection
 --------------------------------------------------------------------------------
-
-This is a test.
