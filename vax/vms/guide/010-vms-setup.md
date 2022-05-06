@@ -21,9 +21,9 @@ For the VAX used in this example, we will use the following parameters:
 
 | Attribute           | Value       |
 |---------------------|-------------|
-| Installation device | `DKA400`    |
-| Target device       | `DKA100`    |
-| Hostname            | `NASHUA`    |
+| Installation device | `DKA100`    |
+| Target device       | `DKA0`      |
+| Hostname            | `BOSTON`    |
 | TCP/IP address      | `10.0.0.40` |
 | DECnet address      | `1.40`      |
 | System ID           | `1064`      |
@@ -42,57 +42,86 @@ issuing the command:
 
 ...after which a table will be displayed of currently connected devices,
 most importantly their names and types. Our VAX has an attached RRD42 CD-ROM
-drive with the label `DKA400` and type `RODISK` that we will be booting from.
+drive with the label `DKA100` and type `RODISK` that we will be booting from.
 
-Now that we have determined `DKA400` to be our boot device, we can boot from
+Now that we have determined `DKA100` to be our boot device, we can boot from
 it by issuing the command:
 
-`                                BOOT DKA400                                   `
+`                                BOOT DKA100                                   `
 
 ...which will start booting the VMS image from the disk. 
 
 ### Installing VMS
 
+Once the CD image is booted, you will be prompted to enter in a date and time
+in `DD-MMM-YYYY HH:MM` format, for example `06-MAY-2022 16:30`. After entering
+the time, VMS will then configure system devices... and drop you directly into
+a command prompt.
+
 Although I mentioned the VMS installation process is generally easy, that's not
 to say it isn't *different*. The CDs themselves do not have any kind of guided
-installer, but rather a *backup image* of a fresh VMS installation loaded on
-them and an extremely lightweight copy of VMS with just the bare minimum of
-tools needed to restore it. As such, once the CD boots you will be dumped into
-a command prompt, from which you only need to run the following command:
+installer, but rather a backup image (or *save set*) of a fresh VMS installation 
+loaded on them and an extremely lightweight copy of VMS with just the bare 
+minimum of tools needed to restore it to disk, namely the `BACKUP` utility.
 
-`                   BACKUP DKA400:VMS061.B/SAVE_SET DKA100:                    `
+To use the `BACKUP` utility, you will need to know the filename of the save set.
+This is usually provided by documentation, but if you don't have it you can
+make an educated guess based on the version of VMS you're installing. VMS
+save sets from personal experience tend to take the form 
+`VMS[Suffix][Version].B`, meaning VAX/VMS 5.5-2H4's save set would have the name
+`VMS2H4055.B` while OpenVMS 6.1, which has no suffix, would simply be 
+`VMS061.B`. We're installing the former version on our system, so we'll issue
+the command:
+
+`                   BACKUP DKA100:VMS061.B/SAVE_SET DKA0:                      `
 
 ...which kicks off the backup restore process in an automated fashion. Once it
 is complete, reboot the system. Depending on the state of your VAX and how you
 booted it from the installation CD immediately, you may need to re-enter the
-console and change or otherwise manually boot from the hard disk. Our VAX
-hard disk is `DKA100`.
+console and change or otherwise manually boot from the hard disk. Recall that
+our VAX hard disk is `DKA0`.
 
 After booting the newly imaged hard disk, the system will begin the installation 
 process by asking for a label for the system volume it's worthwhile to give your 
 system a unique volume label if you would like to configure it as part of a 
-cluster. For NASHUA, the *volume label* is `NASHUA$SYS`.
+cluster. For BOSTON, the *volume label* is `BOSTON$SYS`.
 
-The system will then ask for the name of the drive hosting the distribution
-media, in NASHUA's case this is `DKA400`. The media is ready to be mounted.
+The installation procedure will then ask for the name of the drive hosting 
+the distribution media, in BOSTON's case this is `DKA100`. 
+The media is ready to be mounted.
 
-For optional software, select all options *except* DECwindows support; as
-NASHUA is running in a headless configuration, a graphical environment is
-unneeded. After a few confirmation steps, the system will begin installing 
-the selected options.
+For optional libraries and software, we will select all available options
+except anything relating to DECwindows, since BOSTON is running as a
+headless system and does not need a graphical environment. After a few 
+confirmation steps, the system will begin installing the selected options.
 
-Once this step is complete, the installation procedure will begin setting up
-the `SYSTEM`, `SYSTEST` and `FIELD` accounts. Provide an appropriate password
-for at least `SYSTEM`, the other accounts can then be given randomized passwords 
-as they will be disabled when setup is complete.
+Once the optional software installation is completed, the installation
+procedure will ask if the system will be part of a cluster. 
+For the moment, we will answer no.
+
+The installation procedure will now begin setting up the `SYSTEM`, `SYSTEST` 
+and `FIELD` accounts. Provide an appropriate password for at least `SYSTEM`, 
+the other accounts can then be given randomized passwords as they will be 
+disabled when setup is complete.
+
+After account setup is complete, the installation procedure will ask if you
+have any Product Authorization Keys to register. We will do this afterwards,
+so you can answer no.
+
+Finally, the system will reboot.
+
+--------------------------------------------------------------------------------
+
+*This section is currently orphaned as this page is being rewritten with an
+older version of VMS (5.5-2H4)*
 
 The system will now begin setting up DECnet starting by asking for the SCSNODE
-name, which in this case is `NASHUA`. SCSNODE names can be only six characters
+name, which in this case is `BOSTON`. SCSNODE names can be only six characters
 long.
 
-Setup then asks for an SCSSYSTEMID, which for NASHUA is `1064`. This is
+Setup then asks for an SCSSYSTEMID, which for BOSTON is `1064`. This is
 calculated from the formula `A * 1024 + N`, where A is the DECnet area and
-N is the DECnet node number. For NASHUA we have chosen area `1` and the
+N is the DECnet node number. For BOSTON we have chosen area `1` and the
 last octet of the system's static IP address as the node number, `40`.
 
 Finally, enter the system time zone information to complete the setup process.
